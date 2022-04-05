@@ -75,7 +75,7 @@ const StatusDistribution = ({ notifications, logo, company }) => {
                 borderColor: "rgb(255, 99, 132, 1)",
             },
             {
-                type: 'line',
+                type: 'scatter',
                 label: "Average Revenue per Profession per Contract",
                 yAxisID: 'C',
                 data: Object.values(averageRevenuePerJob),
