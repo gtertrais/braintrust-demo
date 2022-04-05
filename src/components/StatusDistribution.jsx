@@ -137,7 +137,7 @@ const StatusDistribution = ({ notifications, logo, company }) => {
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            if (context.dataset.yAxisID === 'B') {
+                            if (context.dataset.yAxisID === 'A' || context.dataset.yAxisID === 'C') {
                                 label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
                             } else {
                                 label += context.parsed.y;
