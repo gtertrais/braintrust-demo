@@ -13,25 +13,38 @@ function App() {
   const [showTableView, setShowTableView] = useState(false);
   const [companies, setCompanies] = useState([]);
   const [selectedCie, setSelectedCie] = useState('');
+  const [jobs, setJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState('');
   const [total, setTotal] = useState(undefined);
   const [totalBTRST, setTotalBTRST] = useState(undefined);
   const [selectedCieLogo, setSelectedCieLogo] = useState('');
 
-  useEffect(async () => {
-    d3.csv("/fee_records.csv").then( async (d) => {
-      await getBTRST();
+  useEffect(() => {
+    d3.csv("./fee_records.csv").then((d) => {
+      getBTRST();
       getCompanies(d);
+      getJobs(d);
       getTotal(d);
       load(d);
     });
     return () => undefined;
-  }, [selectedCie]);
+  }, [selectedCie, selectedJob]);
 
 
   const load = (d) => {
-    if (selectedCie) {
+    if (selectedCie && !selectedJob) {
       const filteredNotif = d.filter(
         (notif) => notif.employer_name === selectedCie
+      );
+      setNotifications(filteredNotif);
+    } else if (selectedJob && !selectedCie) {
+      const filteredNotif = d.filter(
+        (notif) => notif.job_title === selectedJob
+      );
+      setNotifications(filteredNotif);
+    } else if (selectedJob && selectedCie) {
+      const filteredNotif = d.filter(
+        (notif) => notif.job_title === selectedJob && notif.employer_name === selectedCie
       );
       setNotifications(filteredNotif);
     } else {
@@ -46,6 +59,12 @@ function App() {
   const handleCompanyChange = (e) => {
     setSelectedCieLogo(companies[e]);
     setSelectedCie(e);
+    getTotal(notifications);
+    getBTRST();
+  }
+
+  const handleJobChange = (e) => {
+    setSelectedJob(e);
     getTotal(notifications);
     getBTRST();
   }
@@ -68,11 +87,39 @@ function App() {
   }
 
 
+  const getJobs = (d) => {
+    let allJobs = d.reduce(
+      (sortedJobs, job) => {
+        const jobName = job["job_title"];
+        if (jobName in sortedJobs) {
+          sortedJobs[jobName]++;
+        } else {
+          sortedJobs[jobName] = 1;
+        }
+        return sortedJobs;
+      },
+      {}
+    );
+    setJobs(allJobs);
+  }
+
+
+
   const getTotal = (d) => {
     let totalAll;
-    if (selectedCie) {
+    if (selectedCie && !selectedJob) {
       const filteredNotif = d.filter(
         (notif) => notif.employer_name === selectedCie
+      );
+      totalAll = filteredNotif.reduce((total, item) => parseFloat(item.gross_total) + total, 0)
+    } else if (selectedJob && !selectedCie) {
+      const filteredNotif = d.filter(
+        (notif) => notif.job_title === selectedJob
+      );
+      totalAll = filteredNotif.reduce((total, item) => parseFloat(item.gross_total) + total, 0)
+    } else if (selectedJob && selectedCie) {
+      const filteredNotif = d.filter(
+        (notif) => notif.job_title === selectedJob && notif.employer_name === selectedCie
       );
       totalAll = filteredNotif.reduce((total, item) => parseFloat(item.gross_total) + total, 0)
     } else {
@@ -120,18 +167,36 @@ function App() {
             <Switch checked={showTableView} onChange={handleSwitchValueChange} style={{ marginLeft: '5px', marginBottom: '3px' }} />
           </Col>
           <Col span={24} style={{ marginBottom: "10px", textAlign: 'center' }}>
-            <Select placeholder='Select a Company' style={{ width: '20%' }} onChange={handleCompanyChange} allowClear={true}>
+            <Select placeholder='Select a Company' style={{ width: '20%' }} onChange={handleCompanyChange} allowClear={true} showSearch={true}>
               {Object.keys(companies).map((item, i) => (
                 <Option key={i} value={item}>{item}</Option>
               ))}
             </Select>
           </Col>
+          <Col span={24} style={{ marginBottom: "10px", textAlign: 'center' }}>
+            <Select placeholder='Select a Profession' style={{ width: '20%' }} onChange={handleJobChange} allowClear={true} showSearch={true}>
+              {Object.keys(jobs).map((item, i) => (
+                <Option key={i} value={item}>{item}</Option>
+              ))}
+            </Select>
+          </Col>
         </Row>
-
+        <hr/>
+        <div className="header content" style={{ justifyContent: 'center' }}>
+          <img className="logo" src={selectedCieLogo ? selectedCieLogo : './logo512.png'} height='50px' />
+          <h1 >{selectedCie ? selectedCie : 'All Companies'}</h1>
+        </div>
+        <div className="header content" style={{ justifyContent: 'center' }}>
+          <h1 >{selectedJob ? selectedJob : 'All Professions'}</h1>
+        </div>
+        <div className="header content" style={{ justifyContent: 'center' }}>
+          <h2>${total} in fees purchased {(total / totalBTRST).toFixed(2)} of BTRST</h2>
+        </div>
+        <hr/>
         {showTableView ? (
           <TableView notifications={notifications} setNotifications={setNotifications} logo={selectedCieLogo} company={selectedCie} total={total} totalBTRST={totalBTRST} />
         ) : (
-          <ChartView notifications={notifications} logo={selectedCieLogo} company={selectedCie} total={total} totalBTRST={totalBTRST}/>
+          <ChartView notifications={notifications} logo={selectedCieLogo} company={selectedCie} total={total} totalBTRST={totalBTRST} />
         )}
       </Card>
     </>
