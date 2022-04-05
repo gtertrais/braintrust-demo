@@ -183,7 +183,7 @@ function App() {
         </Row>
         <hr/>
         <div className="header content" style={{ justifyContent: 'center' }}>
-          <img className="logo" src={selectedCieLogo ? selectedCieLogo : './logo512.png'} height='50px' />
+          <img alt={'logoCie'} className="logo" src={selectedCieLogo ? selectedCieLogo : './logo512.png'} height='50px' />
           <h1 >{selectedCie ? selectedCie : 'All Companies'}</h1>
         </div>
         <div className="header content" style={{ justifyContent: 'center' }}>

@@ -1,6 +1,5 @@
 import React from "react";
 import StatusDistribution from "./StatusDistribution";
-import { Col, Row } from "antd";
 import Timeline from "./Timeline";
 
 const ChartView = ({ notifications, logo, company, setNotifications, total, totalBTRST }) => {
