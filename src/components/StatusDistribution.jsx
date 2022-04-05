@@ -87,7 +87,7 @@ const StatusDistribution = ({ notifications, logo, company }) => {
     };
 
     const options = {
-        type: 'scatter',
+    
 
         scales: {
 
