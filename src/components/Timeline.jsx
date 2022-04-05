@@ -93,8 +93,6 @@ const Timeline = ({ notifications, logo, company, total, totalBTRST }) => {
 
 
   const options = {
-    type: 'scatter',
-
     scales: {
       A: {
         position: 'left',
@@ -107,6 +105,7 @@ const Timeline = ({ notifications, logo, company, total, totalBTRST }) => {
         }
       },
       B: {
+        beginAtZero: true,
         position: 'right',
         ticks: {
           color: "rgb(255, 99, 132)", // this here
